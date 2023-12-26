@@ -3,7 +3,8 @@ project(Renderer)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Renderer main.cpp)
+add_executable(Renderer main.cpp
+        library.cpp)
 target_link_libraries(Renderer ${OPENGL_LIBRARIES})
 target_link_libraries(Renderer ${GLUT_LIBRARIES})
 target_link_libraries(Renderer -lGL -lGLU -lglut)
