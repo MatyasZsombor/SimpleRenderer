@@ -1,4 +1,8 @@
 #include <GL/glut.h>
+#include "vector.h"
+#include "helper_functions.h"
+#include "iostream"
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
