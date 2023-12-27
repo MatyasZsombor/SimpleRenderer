@@ -1,198 +1,105 @@
 #include "header_files/all_headers.h"
 
-float dx, dy;
-
-void cast_rays(const int map[], int h, int w)
+void cast_rays()
 {
-    glColor3f(0,1,1); glBegin(GL_QUADS); glVertex2i(526,  0); glVertex2i(1006,  0); glVertex2i(1006,160); glVertex2i(526,160); glEnd();
-    glColor3f(0,0,1); glBegin(GL_QUADS); glVertex2i(526,160); glVertex2i(1006,160); glVertex2i(1006,320); glVertex2i(526,320); glEnd();
-
-    float xO, yO, rayY, rayX;
-    int mapPos;
-    float rAngle = player.angle - DEGREE * 30;
-    if(rAngle < 0){ rAngle += 2 * PI; }
-    if(rAngle > 2 * PI) { rAngle -= 2 * PI; }
-
-    for (int numR = 0; numR < 60; numR++)
+    for(int x = 0; x < SCREEN_WIDTH; x++)
     {
-        int depthOfField = 0;
-        float aTan = -1 / tanf(rAngle);
-        float hDist = FLT_MAX, hX = player.pos.x, hY = player.pos.y;
+        float cameraX = 2 * x / float(SCREEN_WIDTH - 1);
 
-        if(rAngle > M_PIf)
+        Vector rayDir = Vector(dir.x + cameraPlane.x * cameraX, dir.y + cameraPlane.y * cameraX);
+        Vector mapPos = Vector(int(player.pos.x), int(player.pos.y));
+        Vector sideDist = Vector();
+        Vector deltaDist = Vector(rayDir.x == 0 ? 1e30 : std::abs(1 / rayDir.x), rayDir.y == 0 ? 1e30 : std::abs(1 / rayDir.y));
+        Vector step = Vector();
+
+        float perpWallDist;
+        int hit = 0;
+        int side;
+
+        if(rayDir.x < 0)
         {
-            rayY = (((int)(player.pos.y)>>6)<<6) - 0.0001; // NOLINT(*-narrowing-conversions)
-            rayX = (player.pos.y - rayY) * aTan + player.pos.x;
-            yO = (float)-(w * h);
-            xO = -yO * aTan;
+            step.x = -1;
+            sideDist.x = (player.pos.x - mapPos.x) * deltaDist.x;
         }
-        if(rAngle < M_PIf)
+        else
         {
-            rayY = (((int)player.pos.y>>6)<<6) + (w * h); // NOLINT(*-narrowing-conversions)
-            rayX = (player.pos.y - rayY) * aTan + player.pos.x;
-            yO = (float)(w * h);
-            xO = -yO * aTan;
+            step.x = 1;
+            sideDist.x = (mapPos.x + 1.0 - player.pos.x) * deltaDist.x;
         }
-        if(rAngle == 0 || rAngle == M_PIf)
+        if(rayDir.y < 0)
         {
-            rayX = player.pos.x;
-            rayY = player.pos.y;
-            depthOfField = 8;
+            step.y = -1;
+            sideDist.y = (player.pos.y - mapPos.y) * deltaDist.y;
+        }
+        else
+        {
+            step.y = 1;
+            sideDist.y = (mapPos.y + 1.0 - player.pos.y) * deltaDist.y;
         }
 
-        while(depthOfField < 8)
+        while(hit == 0)
         {
-            int mapX = (int) (rayX)>>6;
-            int mapY = (int) (rayY)>>6;
-            mapPos = mapY * w + mapX;
-
-            if(mapPos > 0 && mapPos < w * h && map[mapPos] > 0)
+            if(sideDist.x < sideDist.y)
             {
-                hX = rayX, hY = rayY;
-                hDist = distance(hX, hY, player.pos.x, player.pos.y);
-                depthOfField = 8;
+                sideDist.x += deltaDist.x;
+                mapPos.x += step.x;
+                side = 0;
             }
-            else{ rayX += xO; rayY += yO; depthOfField += 1; }
-        }
-
-        float nTan = -tanf(rAngle);
-        depthOfField = 0;
-        float vDist = FLT_MAX, vX = player.pos.x, vY = player.pos.y;
-
-        if(rAngle > PI / 2 && rAngle < 3 * PI / 2)
-        {
-            rayX = (((int)(player.pos.x)>>6)<<6) - 0.0001; // NOLINT(*-narrowing-conversions)
-            rayY = (player.pos.x - rayX) * nTan + player.pos.y;
-            xO = (float)-(w * h);
-            yO = -xO * nTan;
-        }
-        if(rAngle < PI / 2 || rAngle > 3 * PI / 2)
-        {
-            rayX = (((int)player.pos.x>>6)<<6) + (w * h); // NOLINT(*-narrowing-conversions)
-            rayY = (player.pos.x - rayX) * nTan + player.pos.y;
-            xO = (float)(w * h);
-            yO = -xO * nTan;
-        }
-        if(rAngle == 0 || rAngle == PI)
-        {
-            rayX = player.pos.x;
-            rayY = player.pos.y;
-            depthOfField = 8;
-        }
-
-        while(depthOfField < 8)
-        {
-            int mapX = (int) (rayX)>>6;
-            int mapY = (int) (rayY)>>6;
-            mapPos = mapY * w + mapX;
-
-            if(mapPos > 0 && mapPos < w * h && map[mapPos] > 0)
+            else
             {
-                vX = rayX, vY = rayY;
-                vDist = distance(vX, vY, player.pos.x, player.pos.y);
-                depthOfField = 8;
+                sideDist.y += deltaDist.y;
+                mapPos.y += step.y;
+                side = 1;
             }
-            else{ rayX += xO; rayY += yO; depthOfField += 1; }
+            if(map[int(mapPos.x)][int(mapPos.y)] > 0) { hit = 1; }
         }
 
-        float fDist;
-        if(vDist < hDist)
+        if(side == 0) { perpWallDist = (sideDist.x - deltaDist.x); }
+        else { perpWallDist = (sideDist.y - deltaDist.y); }
+
+        int lineHeight = (int)(SCREEN_HEIGHT / perpWallDist);
+
+        int drawStart = -lineHeight / 2 + SCREEN_HEIGHT / 2;
+        if(drawStart < 0) { drawStart = 0; }
+        int drawEnd = lineHeight / 2 + SCREEN_HEIGHT / 2;
+        if(drawEnd >= SCREEN_HEIGHT) { drawEnd = SCREEN_HEIGHT - 1; }
+
+        RGB color;
+        switch(map[int(mapPos.x)][int(mapPos.y)])
         {
-            rayX = vX, rayY = vY; fDist = vDist;
-            glColor3f(0.9, 0 , 0);
-        }
-        if(hDist < vDist)
-        {
-            rayX = hX, rayY = hY; fDist = hDist;
-            glColor3f(0.7f, 0, 0);
+            case 1:  color = RGB(1, 0, 0);  break; //red
+            case 2:  color = RGB(0, 1, 0);  break; //green
+            case 3:  color = RGB(0, 0, 1);   break; //blue
+            case 4:  color = RGB(1, 1, 1);  break; //white
+            default: color = RGB(1, 1, 0); break; //yellow
         }
 
-        glLineWidth(3);
+        if (side == 1) {color.divide(2);}
+
+        glColor3f(color.red, color.green, color.blue);
+        glLineWidth(1);
         glBegin(GL_LINES);
-        glVertex2f(player.pos.x, player.pos.y);
-        glVertex2f(rayX, rayY);
+        glVertex2f(x, drawStart);
+        glVertex2f(x, drawEnd);
         glEnd();
-
-        float correctAngle = player.angle - rAngle;
-
-        if(correctAngle < 0){ correctAngle += 2 * PI; }
-        if(correctAngle > 2 * PI) { correctAngle -= 2 * PI; }
-
-        fDist *= cosf(correctAngle);
-        float lineHeight = (float)(w * h * 320) / fDist;
-        float lineOffset = 160 - lineHeight / 2;
-        if(lineHeight  > 320) { lineHeight = 320; }
-
-        glLineWidth(8);
-        glBegin(GL_LINES);
-        glVertex2f((float)numR * 8 + 530, lineOffset);
-        glVertex2f((float)numR * 8 + 530, lineHeight + lineOffset);
-
-        rAngle += DEGREE;
-        if(rAngle < 0){ rAngle += 2 * PI; }
-        if(rAngle > 2 * PI) { rAngle -= 2 * PI; }
     }
-}
-
-void draw_player()
-{
-    glColor3f(1, 1, 0);
-    glPointSize(8);
-    glBegin(GL_POINTS);
-    glVertex2f(player.pos.x, player.pos.y);
-    glEnd();
-
-    glLineWidth(3);
-    glBegin(GL_LINES);
-    glVertex2f(player.pos.x, player.pos.y);
-    glVertex2f(player.pos.x + dx * 5, player.pos.y + dy * 5);
-    glEnd();
 }
 
 void inputs(unsigned char key, int x, int y)
 {
-    if(key == 'a')
-    {
-        player.angle -= 0.1;
-        if(player.angle < 0){player.angle += 2 * PI;}
-        dx = cosf(player.angle) * 5;
-        dy = sinf(player.angle) * 5;
-    }
-    if(key == 'd')
-    {
-        player.angle += 0.1;
-        if(player.angle > 2 * PI){player.angle -= 2 * PI;}
-        dx = cosf(player.angle) * 5;
-        dy = sinf(player.angle) * 5;
-    }
     if(key == 'w')
     {
-        player.pos.x += dx;
-        player.pos.y += dy;
+        player.pos.x += dir.x * 2;
+        player.pos.y += dir.y * 2;
     }
     if(key == 's')
     {
-        player.pos.x -= dx;
-        player.pos.y -= dy;
+        player.pos.x -= dir.x * 2;
+        player.pos.y -= dir.y * 2;
+    }
+    if(key == 27)
+    {
+        exit(0);
     }
     glutPostRedisplay();
-}
-
-void draw_map2d(const int map[], int h, int w)
-{
-    for (int i = 0; i < h; i++)
-    {
-        for(int j = 0; j < w; j++)
-        {
-            if(map[i * w + j] == 1){ glColor3f(1,1,1); }
-            else { glColor3f(0, 0, 0); }
-            int xO = j * h * w, yO = i * h * w;
-            glBegin(GL_QUADS);
-            glVertex2i(xO + 1, yO + 1);
-            glVertex2i(xO + 1, yO + w * h - 1);
-            glVertex2i(xO + w * h - 1, yO + w * h- 1);
-            glVertex2i(xO + w * h - 1, yO + 1);
-        }
-    }
-    glEnd();
 }
