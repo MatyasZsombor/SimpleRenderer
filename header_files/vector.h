@@ -6,8 +6,8 @@
 #define RENDERER_VECTOR_H
 struct Vector {
 public:
-    double x, y, z;
-    explicit Vector(double X = 0, double Y = 0, double Z = 0)
+    float x, y, z;
+    explicit Vector(float X = 0, float Y = 0, float Z = 0)
     {
         x = X, y = Y, z = Z;
     }
