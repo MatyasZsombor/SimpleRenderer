@@ -13,4 +13,5 @@
 #include "iostream"
 #include <GL/glut.h>
 #include "constants.h"
+#include "RGB.h"
 #endif //RENDERER_ALL_HEADERS_H
