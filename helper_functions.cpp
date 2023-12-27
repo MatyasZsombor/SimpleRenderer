@@ -3,22 +3,27 @@
 //
 #include "header_files/all_headers.h"
 
-double magnitude(Vector v)
+float distance(float x1, float y1, float x2, float y2)
 {
-    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
+    return sqrtf(powf(x2 - x1, 2) + powf(y2 - y1, 2));
+}
+
+float magnitude(Vector v)
+{
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
 }
 
 void normalize(Vector v)
 {
-    double mag = magnitude(v);
+    float mag = magnitude(v);
     v.x = v.x / mag;
     v.y = v.y / mag;
     v.z = v.z / mag;
 }
 
-double dot_product(Vector vs[], int n)
+float dot_product(Vector vs[], int n)
 {
-    double res = 0;
+    float res = 0;
     for (int i = 0; i < n - 1; i++)
     {
         res += vs[i].x * vs[i + 1].x + vs[i].y * vs[i + 1].y + vs[i].z * vs[i + 1].z;
