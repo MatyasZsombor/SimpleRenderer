@@ -7,11 +7,11 @@
 struct Player{
 public:
     Vector pos;
-    float angle;
-    explicit Player(float x = 0, float y = 0, float z = 0, float a = 0)
+    Vector dir;
+    explicit Player(float x = 0, float y = 0, float z = 0, float dirX = 0, float dirY = 0)
     {
         pos = Vector(x, y, z);
-        angle = a;
+        dir = Vector(dirX, dirY);
     }
 };
 #endif //RENDERER_PLAYER_H
