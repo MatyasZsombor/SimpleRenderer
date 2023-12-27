@@ -10,6 +10,7 @@ add_executable(Renderer main.cpp
         helper_functions.cpp
         header_files/player.h
         header_files/all_headers.h
+        header_files/constants.h
 )
 target_link_libraries(Renderer ${OPENGL_LIBRARIES})
 target_link_libraries(Renderer ${GLUT_LIBRARIES})
