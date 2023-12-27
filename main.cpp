@@ -1,6 +1,6 @@
 #include <GL/glut.h>
-#include "vector.h"
-#include "helper_functions.h"
+#include "header_files/vector.h"
+#include "header_files/helper_functions.h"
 #include "iostream"
 
 void display()

@@ -5,8 +5,12 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(Renderer main.cpp
         library.cpp
-        helper_functions.h
-        vector.h)
+        header_files/helper_functions.h
+        header_files/vector.h
+        helper_functions.cpp
+        header_files/player.h
+        header_files/all_headers.h
+)
 target_link_libraries(Renderer ${OPENGL_LIBRARIES})
 target_link_libraries(Renderer ${GLUT_LIBRARIES})
 target_link_libraries(Renderer -lGL -lGLU -lglut)
