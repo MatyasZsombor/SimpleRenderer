@@ -11,4 +11,5 @@
 #include "player.h"
 #include "library.h"
 #include "iostream"
+#include <GL/glut.h>
 #endif //RENDERER_ALL_HEADERS_H
