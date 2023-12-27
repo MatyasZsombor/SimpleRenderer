@@ -7,8 +7,8 @@
 struct Player{
 public:
     Vector pos;
-    double angle;
-    explicit Player(double x = 0, double y = 0, double z = 0, double a = 0)
+    float angle;
+    explicit Player(float x = 0, float y = 0, float z = 0, float a = 0)
     {
         pos = Vector(x, y, z);
         angle = a;
