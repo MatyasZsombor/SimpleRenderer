@@ -1,3 +1,4 @@
+#include <iostream>
 #include "header_files/all_headers.h"
 
 void cast_rays()
@@ -6,7 +7,7 @@ void cast_rays()
     {
         float cameraX = 2 * x / float(SCREEN_WIDTH - 1);
 
-        Vector rayDir = Vector(dir.x + cameraPlane.x * cameraX, dir.y + cameraPlane.y * cameraX);
+        Vector rayDir = Vector(player.dir.x + cameraPlane.x * cameraX, player.dir.y + cameraPlane.y * cameraX);
         Vector mapPos = Vector(int(player.pos.x), int(player.pos.y));
         Vector sideDist = Vector();
         Vector deltaDist = Vector(rayDir.x == 0 ? 1e30 : std::abs(1 / rayDir.x), rayDir.y == 0 ? 1e30 : std::abs(1 / rayDir.y));
@@ -95,17 +96,33 @@ void inputs(unsigned char key, int x, int y)
 {
     if(key == 'w')
     {
-        player.pos.x += dir.x * 2;
-        player.pos.y += dir.y * 2;
+        if(map[int(player.pos.x + player.dir.x * moveSpeed)][int(player.pos.y)] == 0) { player.pos.x += player.dir.x * moveSpeed; }
+        if(map[int(player.pos.x)][int(player.pos.y + player.dir.y * moveSpeed)] == 0) { player.pos.y += player.dir.y * moveSpeed; }
     }
     if(key == 's')
     {
-        player.pos.x -= dir.x * 2;
-        player.pos.y -= dir.y * 2;
+        if(map[int(player.pos.x - player.dir.x * moveSpeed)][int(player.pos.y)] == 0) { player.pos.x -= player.dir.x * moveSpeed; }
+        if(map[int(player.pos.x)][int(player.pos.y - player.dir.y * moveSpeed)] == 0) { player.pos.y -= player.dir.y * moveSpeed; }
+    }
+    if (key == 'd')
+    {
+        double oldDirX = player.dir.x;
+        player.dir = Vector(player.dir.x * cosf(-rotSpeed) - player.dir.y * sinf(-rotSpeed), oldDirX * sinf(-rotSpeed) + player.dir.y * cosf(-rotSpeed));
+        double oldPlaneX = cameraPlane.x;
+        cameraPlane = Vector(cameraPlane.x * cosf(-rotSpeed) - cameraPlane.y * sin(-rotSpeed), oldPlaneX * sin(-rotSpeed) + cameraPlane.y * cos(-rotSpeed));
+    }
+    if (key == 'a')
+    {
+        double oldDirX = player.dir.x;
+        player.dir = Vector(player.dir.x * cosf(rotSpeed) - player.dir.y * sinf(rotSpeed), oldDirX * sinf(rotSpeed) + player.dir.y * cosf(rotSpeed));
+        double oldPlaneX = cameraPlane.x;
+        cameraPlane = Vector(cameraPlane.x * cosf(rotSpeed) - cameraPlane.y * sin(rotSpeed), oldPlaneX * sinf(rotSpeed) + cameraPlane.y * cosf(rotSpeed));
     }
     if(key == 27)
     {
         exit(0);
     }
+    std::cout << player.dir.x << std::endl;
+    std::cout << player.dir.y << std::endl;
     glutPostRedisplay();
 }

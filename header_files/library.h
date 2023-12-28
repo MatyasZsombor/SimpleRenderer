@@ -5,7 +5,6 @@
 extern Player player;
 extern Vector cameraPlane;
 extern int map[MAP_WIDTH][MAP_HEIGHT];
-extern Vector dir;
 extern double moveSpeed;
 extern double rotSpeed;
 void draw_line(Vector s, Vector e, int w, RGB color);
