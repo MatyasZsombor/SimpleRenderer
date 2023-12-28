@@ -57,12 +57,12 @@ void cast_rays()
         if(side == 0) { perpWallDist = (sideDist.x - deltaDist.x); }
         else { perpWallDist = (sideDist.y - deltaDist.y); }
 
-        int lineHeight = (int)(SCREEN_HEIGHT / perpWallDist);
+        int lineH = (int)(SCREEN_HEIGHT / perpWallDist);
 
-        int drawStart = -lineHeight / 2 + SCREEN_HEIGHT / 2;
-        if(drawStart < 0) { drawStart = 0; }
-        int drawEnd = lineHeight / 2 + SCREEN_HEIGHT / 2;
-        if(drawEnd >= SCREEN_HEIGHT) { drawEnd = SCREEN_HEIGHT - 1; }
+        int start = -lineH / 2 + SCREEN_HEIGHT / 2;
+        if(start < 0) { start = 0; }
+        int end = lineH / 2 + SCREEN_HEIGHT / 2;
+        if(end >= SCREEN_HEIGHT) { end = SCREEN_HEIGHT - 1; }
 
         RGB color;
         switch(map[int(mapPos.x)][int(mapPos.y)])
@@ -75,14 +75,20 @@ void cast_rays()
         }
 
         if (side == 1) {color.divide(2);}
-
-        glColor3f(color.red, color.green, color.blue);
-        glLineWidth(1);
-        glBegin(GL_LINES);
-        glVertex2f(x, drawStart);
-        glVertex2f(x, drawEnd);
-        glEnd();
+        Vector s = Vector(x, start);
+        Vector e = Vector(x, end);
+        draw_line(s, e, 1, color);
     }
+}
+
+void draw_line(Vector s, Vector e, int w, RGB color)
+{
+    glColor3f(color.red, color.green, color.blue);
+    glLineWidth(w);
+    glBegin(GL_LINES);
+    glVertex2f(s.x, s.y);
+    glVertex2f(e.x, e.y);
+    glEnd();
 }
 
 void inputs(unsigned char key, int x, int y)
