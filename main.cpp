@@ -53,8 +53,6 @@ void display()
 
 int main(int argc, char** argv)
 {
-    auto start = std::chrono::high_resolution_clock::now();
-
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
