@@ -13,6 +13,8 @@ add_executable(Renderer main.cpp
         header_files/constants.h
         header_files/RGB.h
         RGB.cpp
+        header_files/all_headers.h
+        header_files/library.h
 )
 target_link_libraries(Renderer ${OPENGL_LIBRARIES})
 target_link_libraries(Renderer ${GLUT_LIBRARIES})

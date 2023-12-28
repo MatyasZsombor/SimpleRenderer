@@ -60,7 +60,6 @@ void display()
 
 int main(int argc, char** argv)
 {
-    clock_t beginFrame = clock();
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
