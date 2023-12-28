@@ -1,10 +1,11 @@
+#include <iostream>
+#include <chrono>
 #include "header_files/all_headers.h"
 
 Player player = Player();
 Vector cameraPlane;
-Vector dir;
-double moveSpeed = 0;
-double rotSpeed = 0;
+double moveSpeed = 0.1;
+double rotSpeed = 0.05;
 
 int map[MAP_WIDTH][MAP_HEIGHT]=
         {
@@ -40,15 +41,7 @@ void init()
     gluOrtho2D(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     player.pos.x = 22, player.pos.y = 12;
     cameraPlane = Vector(0, 0.66);
-    dir = Vector(-1, 0);
-}
-
-void input(unsigned char key, int x, int y)
-{
-    if(key == 27)
-    {
-        exit(0);
-    }
+    player.dir = Vector(-0.5, -0.5);
 }
 
 void display()
@@ -60,12 +53,15 @@ void display()
 
 int main(int argc, char** argv)
 {
+    auto start = std::chrono::high_resolution_clock::now();
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     glutCreateWindow("Simple Ray caster");
     init();
     glutDisplayFunc(display);
+
     glutKeyboardFunc(inputs);
     glutMainLoop();
     return 0;
