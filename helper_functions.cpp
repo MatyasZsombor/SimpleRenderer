@@ -3,11 +3,14 @@
 //
 #include "header_files/all_headers.h"
 
-void multiply(float sc, Vector v)
+Vector rotate(Vector v, float a)
 {
-    v.x *= sc;
-    v.y *= sc;
-    v.z *= sc;
+    return Vector(v.x * cosf(a) - v.y * sinf(a), v.x * sinf(a) + v.y * cosf(a));
+}
+
+Vector multiply(float sc, Vector v)
+{
+    return Vector(v.x * sc, v.y * sc, v.z * sc);
 }
 
 float distance(float x1, float y1, float x2, float y2)
