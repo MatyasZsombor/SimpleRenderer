@@ -32,6 +32,8 @@ int map[MAP_WIDTH][MAP_HEIGHT]=
 
 void init()
 {
+    parse_map();
+
     state.window = SDL_CreateWindow("DEMO",SDL_WINDOWPOS_CENTERED_DISPLAY(0),SDL_WINDOWPOS_CENTERED_DISPLAY(0),SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_PRESENTVSYNC);
     state.texture = SDL_CreateTexture(state.renderer,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);

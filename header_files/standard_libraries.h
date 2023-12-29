@@ -13,4 +13,5 @@
 #include <cstdint>
 #include "SDL2/SDL.h"
 #include "cmath"
+#include <fstream>
 #endif //RENDERER_STANDARD_LIBRARIES_H
