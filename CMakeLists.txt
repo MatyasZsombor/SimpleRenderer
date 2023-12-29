@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 project(Renderer)
 
 set(CMAKE_CXX_STANDARD 17)
+find_package(SDL2 REQUIRED)
 
 add_executable(Renderer main.cpp
         library.cpp
@@ -15,8 +16,8 @@ add_executable(Renderer main.cpp
         RGB.cpp
         header_files/all_headers.h
         header_files/library.h
+        header_files/state.h
 )
-target_link_libraries(Renderer ${OPENGL_LIBRARIES})
-target_link_libraries(Renderer ${GLUT_LIBRARIES})
-target_link_libraries(Renderer -lGL -lGLU -lglut)
+target_link_libraries(Renderer ${SDL2_LIBRARIES})
+target_link_libraries(Renderer -lSDL2)
 target_link_libraries(Renderer ${m})
