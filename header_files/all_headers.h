@@ -4,15 +4,12 @@
 
 #ifndef RENDERER_ALL_HEADERS_H
 #define RENDERER_ALL_HEADERS_H
-#include <iostream>
-#include <cstdint>
+#include "standard_libraries.h"
 
 typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
-#include "SDL2/SDL.h"
-#include "cmath"
 #include "constants.h"
 #include "RGB.h"
 #include "vector.h"

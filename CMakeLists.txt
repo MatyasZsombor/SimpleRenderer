@@ -17,6 +17,7 @@ add_executable(Renderer main.cpp
         header_files/all_headers.h
         header_files/library.h
         header_files/state.h
+        header_files/standard_libraries.h
 )
 target_link_libraries(Renderer ${SDL2_LIBRARIES})
 target_link_libraries(Renderer -lSDL2)
