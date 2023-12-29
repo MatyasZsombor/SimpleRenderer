@@ -36,18 +36,18 @@ void cast_rays()
             val = map[int(mapPos.x)][int(mapPos.y)];
         }
 
-        u32 color;
+        RGB color;
         switch (val) {
-            case 1: color = 0xFF0000FF; break;
-            case 2: color = 0xFF00FF00; break;
-            case 3: color = 0xFFFF0000; break;
-            case 4: color = 0xFFFFFFFF; break;
-            default: color = 0xFF00FFFF; break;
+            case 1: color = RGB(255, 0, 0); break;
+            case 2: color = RGB(0, 255, 0); break;
+            case 3: color = RGB(0, 0, 255); break;
+            case 4: color = RGB(255, 255, 255); break;
+            default: color = RGB(255, 255, 0); break;
         }
 
-        if (side == 1) {
-            u32 br = ((color & 0xFF00FF) * 0xC0) >> 8, g  = ((color & 0x00FF00) * 0xC0) >> 8;
-            color = 0xFF000000 | (br & 0xFF00FF) | (g & 0x00FF00);
+        if (side == 1)
+        {
+            color.divide(1.5);
         }
 
         float perpendicularDist = side == 0 ? (sideDist.x - deltaDist.x) : (sideDist.y - deltaDist.y);
@@ -56,7 +56,7 @@ void cast_rays()
         y1 = min((SCREEN_HEIGHT / 2) + (lineH / 2), SCREEN_HEIGHT - 1);
 
         vertical_line(x, 0, y0, 0xFF202020);
-        vertical_line(x, y0, y1, color);
+        vertical_line(x, y0, y1, color.convert_to_hex());
         vertical_line(x, y1, SCREEN_HEIGHT - 1, 0xFF505050);
     }
 }

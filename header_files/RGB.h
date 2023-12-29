@@ -4,6 +4,8 @@
 
 #ifndef RENDERER_RGB_H
 #define RENDERER_RGB_H
+#include "all_headers.h"
+
 struct RGB{
 public:
     float red, green, blue;
@@ -14,5 +16,6 @@ public:
         blue = b;
     }
     void divide(float d);
+    u32 convert_to_hex() const;
 };
 #endif //RENDERER_RGB_H
