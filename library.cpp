@@ -1,46 +1,27 @@
 #include <iostream>
 #include "header_files/all_headers.h"
 
-/*void cast_rays()
+#define min(a, b) ({ __typeof__(a) _a = (a), _b = (b); _a < _b ? _a : _b; })
+#define max(a, b) ({ __typeof__(a) _a = (a), _b = (b); _a > _b ? _a : _b; })
+#define sign(a) ({__typeof__(a) _a = (a); (__typeof__(a))(_a < 0 ? -1 : (_a > 0 ? 1 : 0));})
+
+void cast_rays()
 {
-    for(int x = 0; x < SCREEN_WIDTH; x++)
+    Vector plane = state.plane;
+    Player player = state.player;
+    for (int x = 0; x < SCREEN_WIDTH; x++) 
     {
-        float cameraX = 2 * x / float(SCREEN_WIDTH - 1);
+        float cameraX = (2 * (x / (float) (SCREEN_WIDTH))) - 1;
+        Vector rayDirection = Vector(state.player.dir.x + plane.x * cameraX,state.player.dir.y + plane.y * cameraX);
+        Vector mapPos = Vector((int) player.pos.x, (int) player.pos.y);
+        Vector deltaDist = Vector(fabsf(rayDirection.x) < 1e-20 ? 1e30 : fabsf(1.0f / rayDirection.x), fabsf(rayDirection.y) < 1e-20 ? 1e30 : fabsf(1.0f / rayDirection.y));
+        Vector sideDist = Vector(deltaDist.x * (rayDirection.x < 0 ? (player.pos.x - mapPos.x) : (mapPos.x + 1 - player.pos.x)), deltaDist.y * (rayDirection.y < 0 ? (player.pos.y - mapPos.y) : (mapPos.y + 1 - player.pos.y)));
+        Vector step = Vector((int) sign(rayDirection.x), (int) sign(rayDirection.y));
 
-        Vector rayDir = Vector(player.dir.x + cameraPlane.x * cameraX, player.dir.y + cameraPlane.y * cameraX);
-        Vector mapPos = Vector(int(player.pos.x), int(player.pos.y));
-        Vector sideDist = Vector();
-        Vector deltaDist = Vector(rayDir.x == 0 ? 1e30 : std::abs(1 / rayDir.x), rayDir.y == 0 ? 1e30 : std::abs(1 / rayDir.y));
-        Vector step = Vector();
+        int val = 0, side = 0;
 
-        float perpWallDist;
-        int hit = 0;
-        int side;
-
-        if(rayDir.x < 0)
-        {
-            step.x = -1;
-            sideDist.x = (player.pos.x - mapPos.x) * deltaDist.x;
-        }
-        else
-        {
-            step.x = 1;
-            sideDist.x = (mapPos.x + 1.0 - player.pos.x) * deltaDist.x;
-        }
-        if(rayDir.y < 0)
-        {
-            step.y = -1;
-            sideDist.y = (player.pos.y - mapPos.y) * deltaDist.y;
-        }
-        else
-        {
-            step.y = 1;
-            sideDist.y = (mapPos.y + 1.0 - player.pos.y) * deltaDist.y;
-        }
-
-        while(hit == 0)
-        {
-            if(sideDist.x < sideDist.y)
+        while (!val) {
+            if (sideDist.x < sideDist.y)
             {
                 sideDist.x += deltaDist.x;
                 mapPos.x += step.x;
@@ -52,46 +33,75 @@
                 mapPos.y += step.y;
                 side = 1;
             }
-            if(map[int(mapPos.x)][int(mapPos.y)] > 0) { hit = 1; }
+            val = map[int(mapPos.x)][int(mapPos.y)];
         }
 
-        if(side == 0) { perpWallDist = (sideDist.x - deltaDist.x); }
-        else { perpWallDist = (sideDist.y - deltaDist.y); }
-
-        int lineH = (int)(SCREEN_HEIGHT / perpWallDist);
-
-        int start = -lineH / 2 + SCREEN_HEIGHT / 2;
-        if(start < 0) { start = 0; }
-        int end = lineH / 2 + SCREEN_HEIGHT / 2;
-        if(end >= SCREEN_HEIGHT) { end = SCREEN_HEIGHT - 1; }
-
-        RGB color;
-        switch(map[int(mapPos.x)][int(mapPos.y)])
-        {
-            case 1:  color = RGB(1, 0, 0);  break; //red
-            case 2:  color = RGB(0, 1, 0);  break; //green
-            case 3:  color = RGB(0, 0, 1);   break; //blue
-            case 4:  color = RGB(1, 1, 1);  break; //white
-            default: color = RGB(1, 1, 0); break; //yellow
+        u32 color;
+        switch (val) {
+            case 1: color = 0xFF0000FF; break;
+            case 2: color = 0xFF00FF00; break;
+            case 3: color = 0xFFFF0000; break;
+            case 4: color = 0xFFFFFFFF; break;
+            default: color = 0xFF00FFFF; break;
         }
 
-        if (side == 1) {color.divide(2);}
-        Vector s = Vector(x, start);
-        Vector e = Vector(x, end);
-        draw_line(s, e, 1, color);
+        if (side == 1) {
+            u32 br = ((color & 0xFF00FF) * 0xC0) >> 8, g  = ((color & 0x00FF00) * 0xC0) >> 8;
+            color = 0xFF000000 | (br & 0xFF00FF) | (g & 0x00FF00);
+        }
+
+        float perpendicularDist = side == 0 ? (sideDist.x - deltaDist.x) : (sideDist.y - deltaDist.y);
+        int lineH = (int) (SCREEN_HEIGHT / perpendicularDist),
+        y0 = max((SCREEN_HEIGHT / 2) - (lineH / 2), 0),
+        y1 = min((SCREEN_HEIGHT / 2) + (lineH / 2), SCREEN_HEIGHT - 1);
+
+        vertical_line(x, 0, y0, 0xFF202020);
+        vertical_line(x, y0, y1, color);
+        vertical_line(x, y1, SCREEN_HEIGHT - 1, 0xFF505050);
     }
 }
 
-void draw_line(Vector s, Vector e, int w, RGB color)
+void vertical_line(int x, int yS, int yE, u32 color)
 {
-    glColor3f(color.red, color.green, color.blue);
-    glLineWidth(w);
-    glBegin(GL_LINES);
-    glVertex2f(s.x, s.y);
-    glVertex2f(e.x, e.y);
-    glEnd();
+    for (int y = yS; y <= yE; y++)
+    {
+        state.pixels[y * SCREEN_WIDTH + x] = color;
+    }
 }
-*/
+
+bool handle_input()
+{
+    const u8 *keyState = SDL_GetKeyboardState(nullptr);
+    float rotSpeed = state.rotSpeed,
+    moveSpeed = state.moveSpeed;
+
+    if (keyState[SDL_SCANCODE_ESCAPE])
+    {
+        state.quit = true;
+        return true;
+    }
+    if (keyState[SDL_SCANCODE_LEFT])
+    {
+        state.player.dir = rotate(state.player.dir, rotSpeed);
+        state.plane = rotate(state.plane, rotSpeed);
+    }
+    if (keyState[SDL_SCANCODE_RIGHT])
+    {
+        state.player.dir = rotate(state.player.dir, -rotSpeed);
+        state.plane = rotate(state.plane, -rotSpeed);
+    }
+    if (keyState[SDL_SCANCODE_UP])
+    {
+        if(map[int(state.player.pos.x + state.player.dir.x * moveSpeed)][int(state.player.pos.y)] == false) { state.player.pos.x += state.player.dir.x * moveSpeed; }
+        if(map[int(state.player.pos.x)][int(state.player.pos.y + state.player.dir.y * moveSpeed)] == false) { state.player.pos.y += state.player.dir.y * moveSpeed; }
+    }
+    if (keyState[SDL_SCANCODE_DOWN])
+    {
+        if(map[int(state.player.pos.x - state.player.dir.x * moveSpeed)][int(state.player.pos.y)] == false) { state.player.pos.x -= state.player.dir.x * moveSpeed; }
+        if(map[int(state.player.pos.x)][int(state.player.pos.y - state.player.dir.y * moveSpeed)] == false) { state.player.pos.y -= state.player.dir.y * moveSpeed; }
+    }
+    return false;
+}
 
 void fill_screen()
 {
@@ -99,7 +109,7 @@ void fill_screen()
     {
         for (int x = 0; x < SCREEN_WIDTH; x++)
         {
-            state.pixels[y * SCREEN_WIDTH + x] = 0xFF000000;
+            state.pixels[y * SCREEN_WIDTH + x] = 0xFF0000FF;
         }
     }
 }

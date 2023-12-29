@@ -2,7 +2,7 @@
 
 State state;
 
-int map[MAP_WIDTH * MAP_HEIGHT]=
+int map[MAP_WIDTH][MAP_HEIGHT]=
         {
                 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -30,14 +30,30 @@ int map[MAP_WIDTH * MAP_HEIGHT]=
                 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
-int main()
+void init()
 {
     state.window = SDL_CreateWindow("DEMO",SDL_WINDOWPOS_CENTERED_DISPLAY(0),SDL_WINDOWPOS_CENTERED_DISPLAY(0),SCREEN_WIDTH,SCREEN_HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
     state.renderer = SDL_CreateRenderer(state.window, -1, SDL_RENDERER_PRESENTVSYNC);
-    state.texture = SDL_CreateTexture(state.renderer,SDL_PIXELFORMAT_RGBA8888,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
+    state.texture = SDL_CreateTexture(state.renderer,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STREAMING,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-    state.player = Player(2, 2, 0, -1.0f, 0.1f);
+    state.rotSpeed = 3.0f * 0.016f;
+    state.moveSpeed = 3.0f * 0.016f;
+
+    state.player = Player(22, 12, 0, -1.0f, 0.1f);
+    state.plane = Vector(0, 0.66f, 0);
     normalize(state.player.dir);
+}
+
+void end()
+{
+    SDL_DestroyTexture(state.texture);
+    SDL_DestroyRenderer(state.renderer);
+    SDL_DestroyWindow(state.window);
+}
+
+int main()
+{
+    init();
 
     while (!state.quit) {
         SDL_Event ev;
@@ -51,16 +67,17 @@ int main()
             }
         }
 
+        if(handle_input())
+        {
+            break;
+        }
         memset(state.pixels, 0, sizeof(state.pixels));
-        fill_screen();
+        cast_rays();
 
         SDL_UpdateTexture(state.texture, nullptr, state.pixels, SCREEN_WIDTH * 4);
         SDL_RenderCopyEx(state.renderer,state.texture,nullptr,nullptr,0.0,nullptr,SDL_FLIP_VERTICAL);
         SDL_RenderPresent(state.renderer);
     }
-
-    SDL_DestroyTexture(state.texture);
-    SDL_DestroyRenderer(state.renderer);
-    SDL_DestroyWindow(state.window);
+    end();
     return 0;
 }
