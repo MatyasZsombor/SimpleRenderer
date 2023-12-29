@@ -9,7 +9,9 @@ struct State{
     SDL_Window *window{};
     SDL_Texture *texture{};
     SDL_Renderer *renderer{};
-    uint pixels[SCREEN_WIDTH * SCREEN_HEIGHT]{};
+    u32 pixels[SCREEN_WIDTH * SCREEN_HEIGHT]{};
+    float rotSpeed{},
+    moveSpeed{};
     bool quit{};
     Player player;
     Vector plane;
