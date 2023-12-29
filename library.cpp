@@ -1,12 +1,13 @@
+#include <iostream>
 #include "header_files/all_headers.h"
 
-void cast_rays()
+/*void cast_rays()
 {
     for(int x = 0; x < SCREEN_WIDTH; x++)
     {
         float cameraX = 2 * x / float(SCREEN_WIDTH - 1);
 
-        Vector rayDir = Vector(dir.x + cameraPlane.x * cameraX, dir.y + cameraPlane.y * cameraX);
+        Vector rayDir = Vector(player.dir.x + cameraPlane.x * cameraX, player.dir.y + cameraPlane.y * cameraX);
         Vector mapPos = Vector(int(player.pos.x), int(player.pos.y));
         Vector sideDist = Vector();
         Vector deltaDist = Vector(rayDir.x == 0 ? 1e30 : std::abs(1 / rayDir.x), rayDir.y == 0 ? 1e30 : std::abs(1 / rayDir.y));
@@ -90,22 +91,15 @@ void draw_line(Vector s, Vector e, int w, RGB color)
     glVertex2f(e.x, e.y);
     glEnd();
 }
+*/
 
-void inputs(unsigned char key, int x, int y)
+void fill_screen()
 {
-    if(key == 'w')
+    for (int y = 0; y < SCREEN_HEIGHT; y++)
     {
-        player.pos.x += dir.x * 2;
-        player.pos.y += dir.y * 2;
+        for (int x = 0; x < SCREEN_WIDTH; x++)
+        {
+            state.pixels[y * SCREEN_WIDTH + x] = 0xFF000000;
+        }
     }
-    if(key == 's')
-    {
-        player.pos.x -= dir.x * 2;
-        player.pos.y -= dir.y * 2;
-    }
-    if(key == 27)
-    {
-        exit(0);
-    }
-    glutPostRedisplay();
 }
