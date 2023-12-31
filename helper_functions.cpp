@@ -3,6 +3,27 @@
 //
 #include "header_files/all_headers.h"
 
+std::array<std::string, MAP_WIDTH> tokenize(const std::string& s, char del)
+{
+    std::array<std::string, MAP_WIDTH> arr = {};
+    int i = 0;
+    std::string tmp;
+    for(char ch : s)
+    {
+        if (ch != del)
+        {
+            tmp += ch;
+        }
+        else
+        {
+            arr[i] = tmp;
+            i++;
+            tmp = "";
+        }
+    }
+    return arr;
+}
+
 Vector rotate(Vector v, float a)
 {
     return Vector(v.x * cosf(a) - v.y * sinf(a), v.x * sinf(a) + v.y * cosf(a));

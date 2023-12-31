@@ -5,6 +5,8 @@
 #define max(a, b) ({ __typeof__(a) _a = (a), _b = (b); _a > _b ? _a : _b; })
 #define sign(a) ({__typeof__(a) _a = (a); (__typeof__(a))(_a < 0 ? -1 : (_a > 0 ? 1 : 0));})
 
+std::string testArr[MAP_WIDTH][MAP_HEIGHT];
+
 void cast_rays()
 {
     Vector plane = state.plane;
@@ -71,13 +73,17 @@ void vertical_line(int x, int yS, int yE, u32 color)
 
 void parse_map()
 {
-    int x = 0, y = 0;
+    int y = 0;
     std::ifstream file("/home/poci/Desktop/C++/renderer/map.txt");
     std::string line;
-    if (file.is_open()) {
+    if (file.is_open())
+    {
         while (getline(file, line))
         {
-            std::cout << line;
+            boost::algorithm::trim(line);
+            auto tokens = tokenize(line, ';');
+            std::copy(std::begin(tokens), std::end(tokens), std::begin(testArr[y]));
+            y++;
         }
         file.close();
     }

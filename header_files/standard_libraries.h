@@ -13,5 +13,8 @@
 #include <cstdint>
 #include "SDL2/SDL.h"
 #include "cmath"
+#include <vector>
+#include <array>
+#include <boost/algorithm/string.hpp>
 #include <fstream>
 #endif //RENDERER_STANDARD_LIBRARIES_H
