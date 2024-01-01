@@ -5,7 +5,7 @@
 #include "all_headers.h"
 #ifndef RENDERER_HELPERFUNCTIONS_H
 #define RENDERER_HELPERFUNCTIONS_H
-std::array<std::string, MAP_WIDTH> tokenize(const std::string& s, char del = '\0');
+std::vector<std::string> tokenize(const std::string& s, char del = '\0', int size = 1);
 Vector rotate(Vector v, float a);
 Vector multiply(float sc, Vector v);
 float distance(float x1, float y1, float x2, float y2);

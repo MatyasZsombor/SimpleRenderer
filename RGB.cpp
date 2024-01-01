@@ -2,7 +2,7 @@
 // Created by poci on 12/27/23.
 //
 
-#include "header_files/RGB.h"
+#include "header_files/all_headers.h"
 
 
 void RGB::divide(float d)

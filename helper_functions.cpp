@@ -3,9 +3,9 @@
 //
 #include "header_files/all_headers.h"
 
-std::array<std::string, MAP_WIDTH> tokenize(const std::string& s, char del)
+std::vector<std::string> tokenize(const std::string& s, char del, int size)
 {
-    std::array<std::string, MAP_WIDTH> arr = {};
+    std::vector<std::string> arr(size);
     int i = 0;
     std::string tmp;
     for(char ch : s)
@@ -20,6 +20,10 @@ std::array<std::string, MAP_WIDTH> tokenize(const std::string& s, char del)
             i++;
             tmp = "";
         }
+    }
+    if(!tmp.empty())
+    {
+        arr[i] = tmp;
     }
     return arr;
 }

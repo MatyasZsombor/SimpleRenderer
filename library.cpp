@@ -5,8 +5,6 @@
 #define max(a, b) ({ __typeof__(a) _a = (a), _b = (b); _a > _b ? _a : _b; })
 #define sign(a) ({__typeof__(a) _a = (a); (__typeof__(a))(_a < 0 ? -1 : (_a > 0 ? 1 : 0));})
 
-std::string testArr[MAP_WIDTH][MAP_HEIGHT];
-
 void cast_rays()
 {
     Vector plane = state.plane;
@@ -20,9 +18,10 @@ void cast_rays()
         Vector sideDist = Vector(deltaDist.x * (rayDirection.x < 0 ? (player.pos.x - mapPos.x) : (mapPos.x + 1 - player.pos.x)), deltaDist.y * (rayDirection.y < 0 ? (player.pos.y - mapPos.y) : (mapPos.y + 1 - player.pos.y)));
         Vector step = Vector((int) sign(rayDirection.x), (int) sign(rayDirection.y));
 
-        int val = 0, side = 0;
+        int side = 0;
+        Wall wall = Wall();
 
-        while (!val) {
+        while (!wall.t) {
             if (sideDist.x < sideDist.y)
             {
                 sideDist.x += deltaDist.x;
@@ -35,21 +34,12 @@ void cast_rays()
                 mapPos.y += step.y;
                 side = 1;
             }
-            val = map[int(mapPos.x)][int(mapPos.y)];
-        }
-
-        RGB color;
-        switch (val) {
-            case 1: color = RGB(255, 0, 0); break;
-            case 2: color = RGB(0, 255, 0); break;
-            case 3: color = RGB(0, 0, 255); break;
-            case 4: color = RGB(255, 255, 255); break;
-            default: color = RGB(255, 255, 0); break;
+            wall = map[int(mapPos.x)][int(mapPos.y)];
         }
 
         if (side == 1)
         {
-            color.divide(1.5);
+            wall.c.divide(1.5);
         }
 
         float perpendicularDist = side == 0 ? (sideDist.x - deltaDist.x) : (sideDist.y - deltaDist.y);
@@ -58,7 +48,7 @@ void cast_rays()
         y1 = min((SCREEN_HEIGHT / 2) + (lineH / 2), SCREEN_HEIGHT - 1);
 
         vertical_line(x, 0, y0, 0xFF202020);
-        vertical_line(x, y0, y1, color.convert_to_hex());
+        vertical_line(x, y0, y1, wall.c.convert_to_hex());
         vertical_line(x, y1, SCREEN_HEIGHT - 1, 0xFF505050);
     }
 }
@@ -73,17 +63,33 @@ void vertical_line(int x, int yS, int yE, u32 color)
 
 void parse_map()
 {
-    int y = 0;
+    int x = 0;
     std::ifstream file("/home/poci/Desktop/C++/renderer/map.txt");
     std::string line;
     if (file.is_open())
     {
         while (getline(file, line))
         {
+            int y = 0;
             boost::algorithm::trim(line);
-            auto tokens = tokenize(line, ';');
-            std::copy(std::begin(tokens), std::end(tokens), std::begin(testArr[y]));
-            y++;
+            auto tokens = tokenize(line, ';', MAP_WIDTH);
+            for (const std::string& wall : tokens)
+            {
+                Wall curWall;
+                if(wall[0] == '0')
+                {
+                    curWall = Wall();
+                }
+                else
+                {
+                    auto properties = tokenize(wall, ',', 4);
+                    RGB color = RGB(stoi(properties[1]), stoi(properties[2]), stoi(properties[3]));
+                    curWall = Wall(1, color, stof(properties[0]));
+                }
+                map[x][y] = curWall;
+                y++;
+            }
+            x++;
         }
         file.close();
     }
@@ -112,13 +118,13 @@ bool handle_input()
     }
     if (keyState[SDL_SCANCODE_UP])
     {
-        if(map[int(state.player.pos.x + state.player.dir.x * moveSpeed)][int(state.player.pos.y)] == false) { state.player.pos.x += state.player.dir.x * moveSpeed; }
-        if(map[int(state.player.pos.x)][int(state.player.pos.y + state.player.dir.y * moveSpeed)] == false) { state.player.pos.y += state.player.dir.y * moveSpeed; }
+        if(map[int(state.player.pos.x + state.player.dir.x * moveSpeed)][int(state.player.pos.y)].t == false) { state.player.pos.x += state.player.dir.x * moveSpeed; }
+        if(map[int(state.player.pos.x)][int(state.player.pos.y + state.player.dir.y * moveSpeed)].t == false) { state.player.pos.y += state.player.dir.y * moveSpeed; }
     }
     if (keyState[SDL_SCANCODE_DOWN])
     {
-        if(map[int(state.player.pos.x - state.player.dir.x * moveSpeed)][int(state.player.pos.y)] == false) { state.player.pos.x -= state.player.dir.x * moveSpeed; }
-        if(map[int(state.player.pos.x)][int(state.player.pos.y - state.player.dir.y * moveSpeed)] == false) { state.player.pos.y -= state.player.dir.y * moveSpeed; }
+        if(map[int(state.player.pos.x - state.player.dir.x * moveSpeed)][int(state.player.pos.y)].t == false) { state.player.pos.x -= state.player.dir.x * moveSpeed; }
+        if(map[int(state.player.pos.x)][int(state.player.pos.y - state.player.dir.y * moveSpeed)].t == false) { state.player.pos.y -= state.player.dir.y * moveSpeed; }
     }
     return false;
 }
