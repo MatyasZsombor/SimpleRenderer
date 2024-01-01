@@ -10,11 +10,5 @@ typedef uint32_t u32;
 typedef uint16_t u16;
 typedef uint8_t u8;
 
-#include "constants.h"
-#include "RGB.h"
-#include "vector.h"
-#include "player.h"
-#include "state.h"
-#include "helper_functions.h"
-#include "library.h"
+#include "implemented_headers.h"
 #endif //RENDERER_ALL_HEADERS_H
