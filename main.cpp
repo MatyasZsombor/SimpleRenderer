@@ -3,6 +3,7 @@
 State state;
 
 Wall map[MAP_WIDTH][MAP_HEIGHT];
+uint32_t oldTime, curTime;
 
 void init()
 {
@@ -43,6 +44,12 @@ int main()
             }
         }
 
+        oldTime = curTime;
+        curTime = SDL_GetTicks();
+        double frameTime = (curTime - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
+        std::cout << (1.0 / frameTime) << "\n";
+        state.moveSpeed = frameTime * 5.0;
+        state.rotSpeed = frameTime * 3.0;
         if(handle_input())
         {
             break;
