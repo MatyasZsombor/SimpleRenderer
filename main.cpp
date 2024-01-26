@@ -1,5 +1,6 @@
 #include "header_files/all_headers.h"
 
+
 State state;
 
 Wall map[MAP_WIDTH][MAP_HEIGHT];
